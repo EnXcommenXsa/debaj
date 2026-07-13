@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>أرشيف تنسيقات البروفايل</title>
+    <!-- استدعاء مكتبات جوجل لربط الحساب ودرايف -->
+    <script src="https://apis.google.com/js/api.js"></script>
+    <script src="https://accounts.google.com/gsi/client"></script>
+    
+    <style>
+        body { font-family: Arial, sans-serif; text-align: center; margin-top: 50px; background-color: #f4f4f9;}
+        button { padding: 10px 20px; font-size: 16px; cursor: pointer; margin: 10px; border-radius: 5px; border: none; background-color: #4285F4; color: white;}
+        button:hover { background-color: #357ae8; }
+        #status { margin-top: 20px; font-weight: bold; color: #333; }
+    </style>
+</head>
+<body>
+
+    <h2>مرحباً بك في أرشيف تنسيقاتك</h2>
+    <p>قم بربط حساب جوجل الخاص بك لحفظ بياناتك في درايف</p>
+
+    <!-- أزرار التحكم -->
+    <button id="authorize_button" onclick="handleAuthClick()">ربط حساب Google</button>
+    <button id="signout_button" onclick="handleSignoutClick()" style="display: none; background-color: #d93025;">تسجيل الخروج</button>
+    <button id="save_button" onclick="saveProfileData()" style="display: none; background-color: #34a853;">حفظ التنسيق الحالي</button>
+
+    <div id="status">الرجاء تسجيل الدخول للبدء...</div>
+
+    <script>
+        // ضع هنا المفاتيح الخاصة بك من Google Cloud (سنستخرجها لاحقاً)
+        const CLIENT_ID = 'ضع_معرف_العميل_هنا';
+        const API_KEY = 'ضع_مفتاح_الواجهة_هنا';
+        
+        // الصلاحيات التي نطلبها من المستخدم (الوصول لملفات درايف التي ينشئها الموقع فقط)
+        const SCOPES = 'https://www.googleapis.com/auth/drive.file';
+
+        let tokenClient;
+        let gapiInited = false;
+        let gisInited = false;
+
+        // تهيئة واجهة جوجل (GAPI)
+        gapi.load('client', () => {
+            gapi.client.init({
+                apiKey: API_KEY,
+                discoveryDocs: ['https://www.googleapis.com/discovery/v1/apis/drive/v3/rest'],
+            }).then(() => {
+                gapiInited = true;
+            });
+        });
+
+        // تهيئة نظام تسجيل الدخول (Google Identity Services)
+        window.onload = function () {
+            tokenClient = google.accounts.oauth2.initTokenClient({
+                client_id: CLIENT_ID,
+                scope: SCOPES,
+                callback: (tokenResponse) => {
+                    if (tokenResponse && tokenResponse.access_token) {
+                        document.getElementById('authorize_button').style.display = 'none';
+                        document.getElementById('signout_button').style.display = 'inline-block';
+                        document.getElementById('save_button').style.display = 'inline-block';
+                        document.getElementById('status').innerText = 'تم ربط الحساب بنجاح! يمكنك الآن حفظ تنسيقاتك.';
+                    }
+                },
+            });
+            gisInited = true;
+        };
+
+        // دالة تسجيل الدخول
+        function handleAuthClick() {
+            if (gapiInited && gisInited) {
+                tokenClient.requestAccessToken({prompt: 'consent'});
+            }
+        }
+
+        // دالة تسجيل الخروج
+        function handleSignoutClick() {
+            const token = gapi.client.getToken();
+            if (token !== null) {
+                google.accounts.oauth2.revoke(token.access_token, () => {
+                    gapi.client.setToken('');
+                    document.getElementById('authorize_button').style.display = 'inline-block';
+                    document.getElementById('signout_button').style.display = 'none';
+                    document.getElementById('save_button').style.display = 'none';
+                    document.getElementById('status').innerText = 'تم تسجيل الخروج.';
+                });
+            }
+        }
+
+        // دالة حفظ البيانات (مثال مبسط)
+        async function saveProfileData() {
+            document.getElementById('status').innerText = 'جاري الحفظ في جوجل درايف...';
+            
+            // البيانات التي نريد حفظها (البايو، الألوان، إلخ)
+            const profileData = {
+                username: "اسم المستخدم المائل",
+                bio: "مرحباً بكم في حسابي الجديد 🌟",
+                bgColor: "#ff5733",
+                dateSaved: new Date().toISOString()
+            };
+
+            // تحويل البيانات لملف نصي (JSON)
+            const fileContent = JSON.stringify(profileData);
+            const file = new Blob([fileContent], {type: 'application/json'});
+            const metadata = {
+                'name': 'profile_style_backup.json', // اسم الملف في درايف
+                'mimeType': 'application/json'
+            };
+
+            const accessToken = gapi.client.getToken().access_token;
+            const form = new FormData();
+            form.append('metadata', new Blob([JSON.stringify(metadata)], {type: 'application/json'}));
+            form.append('file', file);
+
+            // إرسال الملف إلى جوجل درايف
+            try {
+                const response = await fetch('https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart', {
+                    method: 'POST',
+                    headers: new Headers({ 'Authorization': 'Bearer ' + accessToken }),
+                    body: form,
+                });
+                
+                if (response.ok) {
+                    document.getElementById('status').innerText = 'تم حفظ التنسيق بنجاح في جوجل درايف الخاص بك! 🎉';
+                } else {
+                    document.getElementById('status').innerText = 'حدث خطأ أثناء الحفظ.';
+                }
+            } catch (error) {
+                console.error(error);
+                document.getElementById('status').innerText = 'فشل الاتصال بجوجل درايف.';
+            }
+        }
+    </script>
+</body>
+</html>
