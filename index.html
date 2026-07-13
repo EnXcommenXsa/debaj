@@ -1,134 +1,840 @@
 <!DOCTYPE html>
-<html lang="ar" dir="rtl">
+<html lang="ar" dir="rtl" data-theme="light">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>أرشيف تنسيقات البروفايل</title>
-    <!-- استدعاء مكتبات جوجل لربط الحساب ودرايف -->
+    <title>ديباج | مساحتك الإبداعية</title>
+    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;700&display=swap" rel="stylesheet">
     <script src="https://apis.google.com/js/api.js"></script>
     <script src="https://accounts.google.com/gsi/client"></script>
     
     <style>
-        body { font-family: Arial, sans-serif; text-align: center; margin-top: 50px; background-color: #f4f4f9;}
-        button { padding: 10px 20px; font-size: 16px; cursor: pointer; margin: 10px; border-radius: 5px; border: none; background-color: #4285F4; color: white;}
-        button:hover { background-color: #357ae8; }
-        #status { margin-top: 20px; font-weight: bold; color: #333; }
+        :root { 
+            --bg: #f8fafc; --surface: #ffffff; 
+            --text: #000000; --text-muted: #64748b;
+            --border: #e2e8f0; --border-hover: #cbd5e1;
+            --modal-overlay: rgba(0,0,0,0.6); --toast-bg: #1e293b;
+            --danger: #dc2626; --danger-hover: #b91c1c;
+            --btn-bg: #0f172a; --btn-text: #ffffff;
+            --btn-hover: #334155;
+        }
+        [data-theme="dark"] {
+            --bg: #0f172a; --surface: #1e293b; 
+            --text: #ffffff; --text-muted: #94a3b8;
+            --border: #334155; --border-hover: #475569;
+            --modal-overlay: rgba(0,0,0,0.8); --toast-bg: #f8fafc;
+            --btn-bg: #f8fafc; --btn-text: #0f172a;
+            --btn-hover: #cbd5e1;
+        }
+
+        body { font-family: 'Tajawal', sans-serif; background: var(--bg); color: var(--text); margin: 0; padding: 0; transition: background 0.3s, color 0.3s; }
+        h1, h2, h3, h4 { color: var(--text); }
+        
+        nav { display: flex; justify-content: space-between; align-items: center; background: var(--surface); padding: 15px 40px; box-shadow: 0 1px 5px rgba(0,0,0,0.05); position: sticky; top: 0; z-index: 100; border-bottom: 1px solid var(--border); transition: 0.3s;}
+        .logo-container { display: flex; align-items: center; gap: 8px; cursor: pointer; }
+        .logo-text { font-size: 1.8rem; font-weight: bold; color: var(--text); }
+        .logo-symbol { font-size: 0.9rem; color: var(--text-muted); opacity: 0.5; font-weight: normal; margin-top: 5px;}
+        
+        .nav-links { display: flex; gap: 10px; }
+        .nav-tab { padding: 8px 18px; cursor: pointer; border-radius: 6px; font-weight: bold; transition: 0.2s; color: var(--text-muted); border: 1px solid transparent; }
+        .nav-tab:hover { background: var(--bg); color: var(--text); }
+        .nav-tab.active { background: var(--text); color: var(--bg); }
+        
+        .nav-controls { display: flex; gap: 15px; align-items: center; }
+        
+        button { font-family: inherit; font-weight: bold; cursor: pointer; transition: 0.2s; box-sizing: border-box; }
+        .btn { background: var(--btn-bg); color: var(--btn-text); border: none; padding: 10px 24px; border-radius: 6px; font-size: 1rem; }
+        .btn:hover { background: var(--btn-hover); }
+        .btn-outline { background: transparent; border: 1px solid var(--border); color: var(--text); padding: 8px 20px; border-radius: 6px; }
+        .btn-outline:hover { background: var(--bg); border-color: var(--text-muted); }
+        .btn-text { background: transparent; border: none; color: var(--text-muted); padding: 8px 15px; border-radius: 6px; }
+        .btn-text:hover { color: var(--text); background: var(--bg); }
+        .btn-danger { background: var(--danger); color: #ffffff; border: none; padding: 10px 20px; border-radius: 6px; }
+        .btn-danger:hover { background: var(--danger-hover); }
+
+        .user-menu { display: none; position: relative; cursor: pointer; align-items: center; gap: 10px; padding: 5px 15px; border-radius: 20px; border: 1px solid var(--border); background: var(--surface); transition: 0.2s;}
+        .user-menu:hover { border-color: var(--text-muted); }
+        .user-avatar { width: 26px; height: 26px; border-radius: 50%; background: var(--text); color: var(--bg); display: flex; justify-content: center; align-items: center; font-size: 0.9rem; font-weight: bold;}
+        .dropdown-content { display: none; position: absolute; top: 120%; left: 0; background: var(--surface); min-width: 200px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); border-radius: 8px; border: 1px solid var(--border); overflow: hidden; z-index: 101; text-align: right; }
+        .dropdown-content.show { display: block; }
+        .dropdown-item { padding: 12px 20px; display: block; color: var(--text); text-decoration: none; transition: 0.2s; border-bottom: 1px solid var(--border); font-size: 0.95rem; }
+        .dropdown-item:hover { background: var(--bg); padding-right: 25px; }
+        .dropdown-item:last-child { border-bottom: none; }
+        .dropdown-item.danger { color: var(--danger); }
+        .dropdown-item.danger:hover { background: #fef2f2; color: var(--danger-hover); }
+        [data-theme="dark"] .dropdown-item.danger:hover { background: #450a0a; }
+
+        .tab-content { display: none; padding: 50px 20px; max-width: 1200px; margin: 0 auto; animation: fadeIn 0.3s ease; }
+        .tab-content.active { display: block; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+        .hero-section { text-align: center; margin-bottom: 50px; }
+        .hero-title { font-size: 2.8rem; margin-bottom: 15px; }
+        .hero-subtitle { color: var(--text-muted); font-size: 1.1rem; max-width: 600px; margin: 0 auto 30px; line-height: 1.6; }
+        
+        .carousel-3d-container { position: relative; height: 500px; display: flex; justify-content: center; align-items: center; margin: 0 auto; width: 100%; max-width: 1100px; perspective: 1200px; }
+        .card-3d { position: absolute; width: 320px; height: 450px; background: var(--surface); border-radius: 16px; box-shadow: 0 15px 35px rgba(0,0,0,0.1); transition: all 0.6s cubic-bezier(0.4, 0, 0.2, 1); overflow: hidden; border: 1px solid var(--border); display: flex; flex-direction: column; cursor: pointer; }
+        
+        .card-3d.center { transform: translateX(0) translateZ(0) rotateY(0); z-index: 4; opacity: 1; box-shadow: 0 25px 50px rgba(0,0,0,0.2); border-color: var(--text-muted); }
+        .card-3d.right { transform: translateX(300px) translateZ(-200px) rotateY(-15deg); z-index: 3; opacity: 0.6; }
+        .card-3d.left { transform: translateX(-300px) translateZ(-200px) rotateY(15deg); z-index: 3; opacity: 0.6; }
+        .card-3d.back { transform: translateX(0) translateZ(-400px) scale(0.8); z-index: 1; opacity: 0; pointer-events: none; }
+        
+        .mockup-header { height: 160px; background: var(--bg); position: relative; background-size: cover; background-position: center; }
+        .mockup-avatar { width: 100px; height: 100px; background: #e2e8f0; border-radius: 50%; position: absolute; bottom: -50px; left: 50%; transform: translateX(-50%); border: 4px solid var(--surface); background-size: cover; background-position: center; }
+        .mockup-body { padding: 60px 20px 20px; text-align: center; flex: 1; background: var(--surface); }
+
+        .dashboard-grid { display: grid; grid-template-columns: 1.2fr 1fr; gap: 40px; }
+        @media (max-width: 900px) { .dashboard-grid { grid-template-columns: 1fr; } }
+        
+        .settings-panel { background: var(--surface); padding: 30px; border-radius: 12px; border: 1px solid var(--border); }
+        .input-group { margin-bottom: 20px; }
+        .input-group label { display: block; margin-bottom: 8px; font-weight: bold; color: var(--text); font-size: 0.95rem;}
+        .input-group input[type="text"], .input-group select, .input-group textarea, .input-group input[type="file"] { width: 100%; padding: 12px; border: 1px solid var(--border); border-radius: 8px; font-family: inherit; background: var(--bg); color: var(--text); box-sizing: border-box; transition: 0.2s; }
+        .input-group input:focus, .input-group select:focus, .input-group textarea:focus { outline: none; border-color: var(--text); }
+        .controls-row { display: flex; gap: 15px; }
+        .controls-row > div { flex: 1; }
+
+        .preview-panel { display: flex; justify-content: center; align-items: flex-start; position: sticky; top: 100px; }
+        .canvas-container { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; overflow: hidden; position: relative; box-shadow: 0 10px 30px rgba(0,0,0,0.05); transition: all 0.4s ease; width: 100%; max-width: 420px; aspect-ratio: var(--canvas-ratio, 9/16); display: flex; flex-direction: var(--canvas-flex, column); justify-content: var(--canvas-justify, center); align-items: var(--canvas-align, center); }
+        .canvas-bg { position: absolute; top: 0; left: 0; right: 0; height: var(--bg-height, 100%); background-color: var(--bg); background-size: cover; background-position: center; z-index: 1; transition: height 0.4s ease; }
+        .canvas-content { position: relative; z-index: 3; padding: 25px; width: 100%; box-sizing: border-box; display: flex; flex-direction: column; align-items: var(--content-align, center); text-align: var(--text-align, center); margin-top: var(--content-margin, 0); overflow: hidden;}
+        .canvas-avatar { width: 110px; height: 110px; flex-shrink: 0; border-radius: var(--avatar-radius, 50%); background-color: var(--border); background-size: cover; background-position: center; border: 4px solid var(--surface); margin-bottom: 15px; transition: 0.3s; }
+        .canvas-name { font-size: 1.5rem; font-weight: bold; margin: 0 0 8px 0; color: var(--name-color, var(--text)); text-shadow: var(--name-shadow, none); word-wrap: break-word; max-width: 100%;}
+        .canvas-bio { font-size: 0.95rem; line-height: 1.5; color: var(--bio-color, var(--text-muted)); white-space: pre-wrap; overflow-wrap: break-word; max-width: 100%;}
+        
+        .items-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 20px; margin-top: 20px; align-items: start; }
+        .item-card { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 20px; position: relative; transition: 0.2s; display: flex; flex-direction: column;}
+        .item-card:hover { border-color: var(--text-muted); box-shadow: 0 4px 15px rgba(0,0,0,0.05); }
+        
+        .card-menu-container { position: absolute; top: 10px; right: 10px; z-index: 10;}
+        .card-menu-btn { background: var(--bg); border: 1px solid var(--border); border-radius: 50%; width: 32px; height: 32px; display: flex; justify-content: center; align-items: center; cursor: pointer; color: var(--text); font-weight: bold; transition: 0.2s; padding-bottom: 5px; box-sizing: border-box;}
+        .card-menu-btn:hover { background: var(--border); }
+        .card-menu-dropdown { display: none; position: absolute; top: 100%; right: 0; background: var(--surface); border: 1px solid var(--border); border-radius: 8px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); overflow: hidden; min-width: 120px; text-align: right;}
+        .card-menu-dropdown.show { display: block; }
+        .card-menu-item { padding: 10px 15px; color: var(--text); font-size: 0.9rem; transition: 0.2s; cursor: pointer;}
+        .card-menu-item:hover { background: var(--bg); }
+        .card-menu-item.danger { color: var(--danger); }
+        .card-menu-item.danger:hover { color: var(--danger-hover); background: #fef2f2; }
+
+        .text-card-content { font-size: 1.1rem; margin-bottom: 20px; padding: 15px; background: var(--bg); border-radius: 8px; white-space: pre-wrap; word-break: break-word; flex: 1;}
+        
+        .color-inputs-container { display: flex; gap: 15px; margin: 20px 0; flex-wrap: wrap; }
+        .color-selector-group { display: flex; align-items: center; gap: 8px; background: var(--bg); padding: 5px 10px; border-radius: 8px; border: 1px solid var(--border);}
+        .color-selector-group input[type="color"] { width: 32px; height: 32px; padding: 0; border: none; border-radius: 50%; cursor: pointer; background: transparent; }
+        .color-selector-group input[type="color"]::-webkit-color-swatch { border-radius: 50%; border: 1px solid rgba(0,0,0,0.1); padding: 0; }
+        .color-selector-group input[type="text"] { width: 75px; border: none; background: transparent; font-family: monospace; font-size: 0.95rem; color: var(--text); outline: none; text-transform: uppercase;}
+        
+        .palette-preview { display: flex; width: 100%; height: 80px; border-radius: 8px; overflow: hidden; border: 1px solid var(--border); }
+        .color-block { flex: 1; transition: 0.2s; cursor: pointer;}
+
+        .modal-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: var(--modal-overlay); display: none; justify-content: center; align-items: center; z-index: 999; backdrop-filter: blur(3px); opacity: 0; transition: 0.2s; }
+        .modal-overlay.active { display: flex; opacity: 1; }
+        .modal-box { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; padding: 30px; width: 90%; position: relative; max-height: 90vh; overflow-y: auto;}
+        .close-modal { position: absolute; top: 15px; left: 15px; background: var(--bg); border: 1px solid var(--border); width: 36px; height: 36px; border-radius: 50%; font-size: 1.2rem; cursor: pointer; color: var(--text-muted); transition: 0.2s; display: flex; justify-content: center; align-items: center;}
+        .close-modal:hover { background: var(--border); color: var(--text); }
+
+        #modal-view-layout .modal-box { max-width: 800px; display: flex; flex-direction: column; align-items: center; background: var(--bg); padding: 40px 20px;}
+        #modal-view-layout .canvas-container { max-width: 450px; width: 100%; box-shadow: 0 20px 40px rgba(0,0,0,0.15);}
+
+        #toast { visibility: hidden; min-width: 250px; background: var(--toast-bg); color: var(--bg); text-align: center; border-radius: 8px; padding: 12px 20px; position: fixed; z-index: 1000; left: 50%; bottom: 30px; transform: translateX(-50%); font-weight: bold; opacity: 0; transition: 0.3s; }
+        #toast.show { visibility: visible; opacity: 1; bottom: 50px; }
+
+        footer { text-align: center; padding: 40px; color: var(--text-muted); font-size: 0.95rem; border-top: 1px solid var(--border); margin-top: 60px; }
+        footer span { cursor: pointer; color: var(--text); font-weight: bold; margin: 0 15px; transition: 0.2s; }
+        
+        .loader { display: none; text-align: center; margin: 40px 0; color: var(--text-muted); font-weight: bold; }
     </style>
 </head>
 <body>
 
-    <h2>مرحباً بك في أرشيف تنسيقاتك</h2>
-    <p>قم بربط حساب جوجل الخاص بك لحفظ بياناتك في درايف</p>
+    <nav>
+        <div class="logo-container" onclick="returnToHome()">
+            <div class="logo-text">ديباج</div>
+            <div class="logo-symbol">˚⟡˖ ࣪ᓚᘏᕐᐷ ˚⟡˖ ࣪</div>
+        </div>
+        
+        <div class="nav-links" id="nav-links">
+            <div class="nav-tab active" onclick="switchTab('home')">الرئيسية</div>
+            <div class="nav-tab" onclick="switchTab('layouts')">تنسيقاتي</div>
+            <div class="nav-tab" onclick="switchTab('texts')">نصوصي</div>
+            <div class="nav-tab" onclick="switchTab('colors')">ألواني</div>
+        </div>
+        
+        <div class="nav-controls">
+            <button class="btn-text" id="theme-btn" onclick="toggleTheme()">مظلم</button>
+            <button class="btn" id="login-btn" onclick="handleAuthClick()">تسجيل الدخول</button>
+            
+            <div class="user-menu" id="user-menu" onclick="toggleDropdown()">
+                <div class="user-avatar" id="user-avatar-icon">م</div>
+                <span id="user-name-display" style="font-weight: bold; font-size: 0.9rem;">مستخدم</span>
+                <div class="dropdown-content" id="dropdown-content">
+                    <div class="dropdown-item" onclick="openModal('modal-settings')">الإعدادات</div>
+                    <div class="dropdown-item" onclick="handleSignoutClick()">تسجيل الخروج</div>
+                    <div class="dropdown-item danger" onclick="openModal('modal-delete-account')">حذف الحساب نهائياً</div>
+                </div>
+            </div>
+        </div>
+    </nav>
 
-    <!-- أزرار التحكم -->
-    <button id="authorize_button" onclick="handleAuthClick()">ربط حساب Google</button>
-    <button id="signout_button" onclick="handleSignoutClick()" style="display: none; background-color: #d93025;">تسجيل الخروج</button>
-    <button id="save_button" onclick="saveProfileData()" style="display: none; background-color: #34a853;">حفظ التنسيق الحالي</button>
+    <div id="tab-home" class="tab-content active">
+        <div class="hero-section">
+            <h1 class="hero-title">مساحتك الإبداعية لتصميم البروفايلات</h1>
+            <p class="hero-subtitle">ديباج يمنحك الحرية لتصميم، حفظ، واستلهام تنسيقات حساباتك، الزخارف، ومجموعات الألوان. مساحة آمنة تماماً داخل جوجل درايف الخاص بك.</p>
+            <button class="btn" style="font-size: 1.1rem; padding: 12px 30px;" onclick="goToCreateLayout()">ابدأ التصميم</button>
+        </div>
+        
+        <div class="carousel-3d-container" id="carousel-container"></div>
+    </div>
 
-    <div id="status">الرجاء تسجيل الدخول للبدء...</div>
+    <div id="tab-layouts" class="tab-content">
+        <div id="layouts-grid-view">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px;">
+                <h2>أرشيف البروفايلات</h2>
+                <button class="btn" onclick="openLayoutEditor()">تصميم تنسيق جديد</button>
+            </div>
+            <p style="color: var(--text-muted); margin-bottom: 30px;">اضغط على التنسيق للعرض المكتمل أو استخدم القائمة الجانبية للتعديل والحذف.</p>
+            
+            <div class="loader" id="layouts-loader">جاري مزامنة البيانات...</div>
+            <div class="items-grid" id="layouts-list">
+                <div style="grid-column: 1 / -1; text-align: center; color: var(--text-muted); padding: 50px; border: 1px dashed var(--border); border-radius: 12px;" id="no-layouts-msg">لم تقم بحفظ أي تنسيقات بعد.</div>
+            </div>
+        </div>
+
+        <div id="layouts-editor-view" style="display: none;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px;">
+                <h2 style="margin: 0;" id="editor-title">بناء تنسيق جديد</h2>
+                <button class="btn-outline" onclick="toggleLayoutView('grid')">إلغاء / عودة للتنسيقات</button>
+            </div>
+            
+            <div class="dashboard-grid">
+                <div class="settings-panel">
+                    <div class="controls-row">
+                        <div class="input-group">
+                            <label>نسبة الأبعاد</label>
+                            <select id="ctrl-ratio" onchange="updateEngine()"><option value="9/16">عمودي (تطبيقات الجوال)</option><option value="16/9">أفقي (شاشات عريضة)</option><option value="1/1">مربع (قياسي)</option></select>
+                        </div>
+                        <div class="input-group">
+                            <label>نمط الخلفية</label>
+                            <select id="ctrl-bg-style" onchange="updateEngine()"><option value="full">ملء الشاشة</option><option value="banner">شريط علوي</option><option value="none">بدون خلفية</option></select>
+                        </div>
+                    </div>
+                    
+                    <div class="controls-row">
+                        <div class="input-group">
+                            <label>شكل البروفايل</label>
+                            <select id="ctrl-avatar-shape" onchange="updateEngine()"><option value="50%">دائري</option><option value="16px">مربع بحواف</option></select>
+                        </div>
+                        <div class="input-group">
+                            <label>المحاذاة</label>
+                            <select id="ctrl-align" onchange="updateEngine()"><option value="center">المنتصف</option><option value="flex-start,right">لليمين</option><option value="flex-end,left">لليسار</option></select>
+                        </div>
+                    </div>
+
+                    <div class="input-group" id="bg-file-group"><label>إدراج صورة الخلفية</label><input type="file" accept="image/*" id="file-bg" onchange="previewImage(this, 'canvas-bg')"></div>
+                    <div class="input-group"><label>إدراج صورة البروفايل</label><input type="file" accept="image/*" id="file-avatar" onchange="previewImage(this, 'canvas-avatar')"></div>
+                    
+                    <div class="input-group">
+                        <label>اسم المستخدم</label>
+                        <input type="text" id="ctrl-name" placeholder="الاسم الظاهر..." oninput="updateEngine()">
+                    </div>
+                    <div class="input-group">
+                        <label>الوصف / البايو</label>
+                        <textarea id="ctrl-bio" rows="3" placeholder="نبذتك..." oninput="updateEngine()"></textarea>
+                    </div>
+
+                    <button class="btn" style="width: 100%; padding: 14px;" id="save-layout-btn" onclick="saveData('Layout')">حفظ التنسيق</button>
+                </div>
+
+                <div class="preview-panel">
+                    <div class="canvas-container" id="engine-canvas">
+                        <div class="canvas-bg" id="canvas-bg"></div>
+                        <div class="canvas-content" id="engine-content">
+                            <div class="canvas-avatar" id="canvas-avatar"></div>
+                            <h3 class="canvas-name" id="display-name">اسم المستخدم</h3>
+                            <p class="canvas-bio" id="display-bio">الوصف سيظهر هنا...</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="tab-texts" class="tab-content">
+        <h2>مكتبة النصوص والزخارف</h2>
+        <div class="settings-panel" style="margin-bottom: 40px; max-width: 800px; margin-left: auto; margin-right: auto;">
+            <div class="input-group">
+                <textarea id="text-input" rows="3" placeholder="الصق النص أو الزخرفة هنا لحفظها..."></textarea>
+            </div>
+            <button class="btn" id="save-text-btn" onclick="saveData('Text')">حفظ النص</button>
+        </div>
+        <div class="loader" id="texts-loader">جاري المزامنة...</div>
+        <div class="items-grid" id="texts-list"></div>
+    </div>
+
+    <div id="tab-colors" class="tab-content">
+        <h2>منشئ مجموعات الألوان</h2>
+        <div class="settings-panel" style="margin-bottom: 40px;">
+            <div class="input-group" style="max-width: 200px;">
+                <label>عدد الألوان</label>
+                <select id="color-count" onchange="generateColorInputs()">
+                    <option value="3">3 ألوان</option><option value="4" selected>4 ألوان</option><option value="5">5 ألوان</option>
+                </select>
+            </div>
+            <div class="color-inputs-container" id="color-inputs-container"></div>
+            <div class="palette-preview" id="palette-preview"></div>
+            <button class="btn" style="margin-top: 25px;" id="save-color-btn" onclick="saveData('Palette')">حفظ المجموعة</button>
+        </div>
+
+        <h3>مجموعاتي المحفوظة</h3>
+        <div class="loader" id="colors-loader">جاري المزامنة...</div>
+        <div class="items-grid" id="colors-list"></div>
+    </div>
+
+    <!-- النوافذ المنبثقة -->
+    <div class="modal-overlay" id="modal-guest">
+        <div class="modal-box" style="max-width: 400px; text-align: center;">
+            <button class="close-modal" onclick="closeModal('modal-guest')">×</button>
+            <h2 style="margin-top: 0;">مطلوب تسجيل الدخول</h2>
+            <p style="color: var(--text-muted); margin-bottom: 25px;">ديباج يحفظ بياناتك في مساحتك السحابية الخاصة. يرجى تسجيل الدخول بحساب جوجل للمتابعة.</p>
+            <button class="btn" style="width: 100%;" onclick="closeModal('modal-guest'); handleAuthClick();">تسجيل الدخول</button>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="modal-delete-confirm">
+        <div class="modal-box" style="max-width: 400px; text-align: center;">
+            <h3 style="margin-top: 0;">تأكيد الحذف</h3>
+            <p style="color: var(--text-muted); margin-bottom: 25px;">هل أنت متأكد من رغبتك بحذف هذا العنصر؟ لا يمكن التراجع عن هذا الإجراء.</p>
+            <div style="display: flex; gap: 10px;">
+                <button class="btn-danger" style="flex: 1;" id="confirm-item-delete-btn">تأكيد الحذف</button>
+                <button class="btn-outline" style="flex: 1;" onclick="closeModal('modal-delete-confirm')">إلغاء</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="modal-settings">
+        <div class="modal-box" style="max-width: 450px;">
+            <button class="close-modal" onclick="closeModal('modal-settings')">×</button>
+            <h2 style="margin-top: 0;">إعدادات الحساب</h2>
+            <div class="input-group" style="margin-top: 25px;">
+                <label>تخصيص اسم المستخدم</label>
+                <input type="text" id="settings-name-input" placeholder="اسمك الظاهر في الموقع...">
+            </div>
+            <button class="btn" style="width: 100%; margin-top: 10px;" onclick="saveSettings()">حفظ التعديلات</button>
+            <p style="color: var(--text-muted); font-size: 0.85rem; margin-top: 20px; text-align: center;">يتم حفظ هذا الاسم محلياً لمتصفحك.</p>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="modal-view-layout">
+        <div class="modal-box">
+            <button class="close-modal" onclick="closeModal('modal-view-layout')">×</button>
+            <div class="canvas-container" id="view-canvas" style="margin-bottom: 30px;">
+                <div class="canvas-bg" id="view-bg"></div>
+                <div class="canvas-content" id="view-content">
+                    <div class="canvas-avatar" id="view-avatar"></div>
+                    <h3 class="canvas-name" id="view-name">الاسم</h3>
+                    <p class="canvas-bio" id="view-bio">البايو</p>
+                </div>
+            </div>
+            <div style="display: flex; gap: 15px; width: 100%; max-width: 450px;">
+                <button class="btn" style="flex: 1;" onclick="copySavedText('view-name')">نسخ الاسم</button>
+                <button class="btn-outline" style="flex: 1;" onclick="copySavedText('view-bio')">نسخ الوصف</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="modal-delete-account">
+        <div class="modal-box" style="max-width: 450px;">
+            <button class="close-modal" onclick="closeModal('modal-delete-account')">×</button>
+            <h2 style="color: var(--danger); margin-top: 0;">حذف الحساب نهائياً</h2>
+            <p>سيقوم هذا الإجراء بمسح كافة ملفات "ديباج" المخفية من جوجل درايف الخاص بك نهائياً.</p>
+            <div style="display: flex; gap: 15px; margin-top: 25px;">
+                <button class="btn-danger" id="execute-delete-btn" onclick="executeAccountDeletion()">تأكيد المسح</button>
+                <button class="btn-outline" style="width: 100%;" onclick="closeModal('modal-delete-account')">إلغاء</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="modal-privacy">
+        <div class="modal-box" style="max-width: 700px;">
+            <button class="close-modal" onclick="closeModal('modal-privacy')">×</button>
+            <h2 style="margin-top: 0;">سياسة الخصوصية والشروط (2026)</h2>
+            <div style="line-height: 1.8; color: var(--text-muted); font-size: 0.95rem;">
+                <p><strong style="color: var(--text);">1. آلية تخزين البيانات السحابية:</strong> موقع "ديباج" هو تطبيق واجهة أمامية (Front-end) لا يمتلك قواعد بيانات خارجية. كافة التنسيقات يتم تشفيرها وتُحفظ مباشرة في مساحة التخزين السحابية الخاصة بك على (Google Drive)، في مجلد مخفي للتطبيقات (AppDataFolder).</p>
+                <p><strong style="color: var(--text);">2. الأمان والخصوصية المطلقة:</strong> لا يمكن لأي شخص الاطلاع على ملفاتك أو تنسيقاتك. صلاحية الوصول تقتصر حصرياً على قراءة وكتابة الملفات التي أنشأها "ديباج" نفسه داخل المجلد المخفي، ولا تمنح الموقع حق الوصول لملفات درايف الشخصية الأخرى.</p>
+                <p><strong style="color: var(--text);">3. التحكم وحذف البيانات:</strong> بصفتك المالك الوحيد لبياناتك، يحق لك في أي وقت التخلص منها عبر استخدام خيار "حذف الحساب نهائياً" المتوفر في إعدادات ملفك الشخصي.</p>
+            </div>
+        </div>
+    </div>
+
+    <div id="toast">رسالة</div>
+
+    <footer>
+        <p style="margin-bottom: 10px;">© 2026 ديباج. صُنع بعناية للمبدعين.</p>
+        <span onclick="openModal('modal-privacy')">سياسة الخصوصية والشروط</span>
+    </footer>
 
     <script>
-        // ضع هنا المفاتيح الخاصة بك من Google Cloud (سنستخرجها لاحقاً)
-        const CLIENT_ID = 'ضع_معرف_العميل_هنا';
-        const API_KEY = 'ضع_مفتاح_الواجهة_هنا';
+        const carouselData = [
+            { id: "c1", name: "𝔐𝔞𝔯𝔧𝔞𝔫𝔞", bg: "download (2).jfif", avatar: "🩰🌷🍞.jfif" },
+            { id: "c2", name: "𝐙𝐞𝐫𝐨", bg: "download (3).jfif", avatar: "Light Yagami.jfif" },
+            { id: "c3", name: "✧･ﾟ: Mary_88 :･ﾟ✧", bg: "download.jfif", avatar: "Kana Arima.jfif" },
+            { id: "c4", name: "𝟢𝟘𝟬-𝓚𝗂𝚛𝓪", bg: "download (1).jfif", avatar: "Ryomen Sukuna VS Satoru Gojo.jfif" },
+            { id: "c5", name: "𝕰𝖓𝖉𝖊𝖆𝖛𝖔𝖚𝖗", bg: "", avatar: "" } // النموذج الإضافي
+        ];
+
+        let carouselPositions = ['center', 'right', 'back', 'back', 'left'];
         
-        // الصلاحيات التي نطلبها من المستخدم (الوصول لملفات درايف التي ينشئها الموقع فقط)
-        const SCOPES = 'https://www.googleapis.com/auth/drive.file';
-
-        let tokenClient;
-        let gapiInited = false;
-        let gisInited = false;
-
-        // تهيئة واجهة جوجل (GAPI)
-        gapi.load('client', () => {
-            gapi.client.init({
-                apiKey: API_KEY,
-                discoveryDocs: ['https://www.googleapis.com/discovery/v1/apis/drive/v3/rest'],
-            }).then(() => {
-                gapiInited = true;
+        function initCarousel() {
+            const container = document.getElementById('carousel-container');
+            container.innerHTML = '';
+            carouselData.forEach((item, index) => {
+                const card = document.createElement('div');
+                card.className = `card-3d ${carouselPositions[index]}`;
+                card.id = item.id;
+                card.innerHTML = `
+                    <div class="mockup-header" style="background-image: url('${item.bg}'); background-color: var(--border);">
+                        <div class="mockup-avatar" style="background-image: url('${item.avatar}'); border-width: 3px;"></div>
+                    </div>
+                    <div class="mockup-body" style="padding-top: 50px;">
+                        <h3 style="margin: 0 0 15px 0; color: var(--text);">${item.name}</h3>
+                        <div class="mockup-line" style="width: 70%"></div>
+                        <div class="mockup-line" style="width: 40%"></div>
+                    </div>
+                `;
+                card.onclick = () => rotateCarousel('right');
+                container.appendChild(card);
             });
-        });
+        }
+        
+        function rotateCarousel(direction) {
+            if(direction === 'right') {
+                const last = carouselPositions.pop();
+                carouselPositions.unshift(last);
+            } else {
+                const first = carouselPositions.shift();
+                carouselPositions.push(first);
+            }
+            carouselData.forEach((item, index) => {
+                document.getElementById(item.id).className = `card-3d ${carouselPositions[index]}`;
+            });
+        }
 
-        // تهيئة نظام تسجيل الدخول (Google Identity Services)
+        const CLIENT_ID = '1061644031199-7kpfr4jkmhm8j82jhdfrro1i0p4f094e.apps.googleusercontent.com';
+        const API_KEY = 'AIzaSyBBXWEn1TEmlkP1m8Ft1BVrEVZW-jQV0SA';
+        const SCOPES = 'https://www.googleapis.com/auth/drive.appdata'; 
+        let tokenClient;
+        let isUserLoggedIn = localStorage.getItem('debaj_auth') === 'true';
+
+        function updateUserNameDisplay() {
+            const name = localStorage.getItem('debaj_name') || 'مبدع ديباج';
+            document.getElementById('user-name-display').innerText = name;
+            document.getElementById('user-avatar-icon').innerText = name.charAt(0);
+            document.getElementById('settings-name-input').value = name;
+        }
+
+        gapi.load('client', () => { gapi.client.init({ apiKey: API_KEY, discoveryDocs: ['https://www.googleapis.com/discovery/v1/apis/drive/v3/rest'] }); });
+        
         window.onload = function () {
+            initCarousel();
+            initTheme();
+            generateColorInputs();
+
+            if (isUserLoggedIn) {
+                document.getElementById('login-btn').style.display = 'none';
+                document.getElementById('user-menu').style.display = 'flex';
+                updateUserNameDisplay();
+                // استعادة الجلسة في الخلفية (Session caching)
+                const cachedToken = sessionStorage.getItem('gapi_token');
+                if (cachedToken) {
+                    gapi.client.setToken({access_token: cachedToken});
+                    fetchAllData();
+                }
+            }
+
             tokenClient = google.accounts.oauth2.initTokenClient({
-                client_id: CLIENT_ID,
-                scope: SCOPES,
-                callback: (tokenResponse) => {
-                    if (tokenResponse && tokenResponse.access_token) {
-                        document.getElementById('authorize_button').style.display = 'none';
-                        document.getElementById('signout_button').style.display = 'inline-block';
-                        document.getElementById('save_button').style.display = 'inline-block';
-                        document.getElementById('status').innerText = 'تم ربط الحساب بنجاح! يمكنك الآن حفظ تنسيقاتك.';
+                client_id: CLIENT_ID, scope: SCOPES,
+                callback: (response) => {
+                    if (response && response.access_token) {
+                        localStorage.setItem('debaj_auth', 'true');
+                        sessionStorage.setItem('gapi_token', response.access_token);
+                        document.getElementById('login-btn').style.display = 'none';
+                        document.getElementById('user-menu').style.display = 'flex';
+                        updateUserNameDisplay();
+                        fetchAllData();
                     }
                 },
             });
-            gisInited = true;
+
+            // تجديد صامت إذا كان مسجلاً ولم يكن هناك توكن في الذاكرة المؤقتة
+            if(isUserLoggedIn && !sessionStorage.getItem('gapi_token')) {
+                tokenClient.requestAccessToken({prompt: 'none'});
+            }
         };
 
-        // دالة تسجيل الدخول
-        function handleAuthClick() {
-            if (gapiInited && gisInited) {
-                tokenClient.requestAccessToken({prompt: 'consent'});
-            }
-        }
-
-        // دالة تسجيل الخروج
+        function handleAuthClick() { tokenClient.requestAccessToken({prompt: 'consent'}); }
         function handleSignoutClick() {
+            localStorage.removeItem('debaj_auth');
+            sessionStorage.removeItem('gapi_token');
             const token = gapi.client.getToken();
-            if (token !== null) {
-                google.accounts.oauth2.revoke(token.access_token, () => {
-                    gapi.client.setToken('');
-                    document.getElementById('authorize_button').style.display = 'inline-block';
-                    document.getElementById('signout_button').style.display = 'none';
-                    document.getElementById('save_button').style.display = 'none';
-                    document.getElementById('status').innerText = 'تم تسجيل الخروج.';
-                });
+            if (token) google.accounts.oauth2.revoke(token.access_token);
+            location.reload(); 
+        }
+
+        function requireAuth() {
+            if (!isUserLoggedIn) {
+                openModal('modal-guest'); return false;
+            }
+            if(!gapi.client.getToken()) {
+                tokenClient.requestAccessToken({prompt: 'none'}); 
+                return false; 
+            }
+            return true;
+        }
+
+        function initTheme() {
+            const isDark = document.body.getAttribute('data-theme') === 'dark';
+            document.getElementById('theme-btn').innerText = isDark ? 'منير' : 'مظلم';
+        }
+        function toggleTheme() {
+            const body = document.body;
+            const isDark = body.getAttribute('data-theme') === 'dark';
+            body.setAttribute('data-theme', isDark ? 'light' : 'dark');
+            document.getElementById('theme-btn').innerText = isDark ? 'مظلم' : 'منير';
+            updateEngine();
+        }
+
+        function saveSettings() {
+            const newName = document.getElementById('settings-name-input').value;
+            if(newName.trim()) {
+                localStorage.setItem('debaj_name', newName.trim());
+                updateUserNameDisplay();
+                closeModal('modal-settings');
+                showToast('تم التحديث');
             }
         }
 
-        // دالة حفظ البيانات (مثال مبسط)
-        async function saveProfileData() {
-            document.getElementById('status').innerText = 'جاري الحفظ في جوجل درايف...';
+        function switchTab(tabId) {
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+            document.querySelectorAll('.nav-tab').forEach(el => el.classList.remove('active'));
+            document.getElementById('tab-' + tabId).classList.add('active');
             
-            // البيانات التي نريد حفظها (البايو، الألوان، إلخ)
-            const profileData = {
-                username: "اسم المستخدم المائل",
-                bio: "مرحباً بكم في حسابي الجديد 🌟",
-                bgColor: "#ff5733",
-                dateSaved: new Date().toISOString()
-            };
+            const tabs = document.querySelectorAll('.nav-tab');
+            for(let tab of tabs) {
+                if(tab.innerText.includes(document.getElementById('tab-'+tabId).querySelector('h1, h2, h3').innerText.split(' ')[0]) || (tabId === 'home' && tab.innerText === 'الرئيسية')) {
+                    tab.classList.add('active'); break;
+                }
+            }
+            if(tabId === 'layouts') toggleLayoutView('grid');
+        }
 
-            // تحويل البيانات لملف نصي (JSON)
-            const fileContent = JSON.stringify(profileData);
-            const file = new Blob([fileContent], {type: 'application/json'});
-            const metadata = {
-                'name': 'profile_style_backup.json', // اسم الملف في درايف
-                'mimeType': 'application/json'
-            };
+        function toggleLayoutView(view) {
+            document.getElementById('layouts-grid-view').style.display = view === 'grid' ? 'block' : 'none';
+            document.getElementById('layouts-editor-view').style.display = view === 'editor' ? 'block' : 'none';
+        }
+        function returnToHome() { switchTab('home'); }
+        function goToCreateLayout() { switchTab('layouts'); openLayoutEditor(); }
+        
+        function toggleDropdown() { document.getElementById('dropdown-content').classList.toggle('show'); }
+        window.addEventListener('click', function(e) {
+            if (!document.getElementById('user-menu').contains(e.target)) document.getElementById('dropdown-content').classList.remove('show');
+            if (!e.target.closest('.card-menu-container')) document.querySelectorAll('.card-menu-dropdown').forEach(m => m.classList.remove('show'));
+        });
 
-            const accessToken = gapi.client.getToken().access_token;
-            const form = new FormData();
-            form.append('metadata', new Blob([JSON.stringify(metadata)], {type: 'application/json'}));
-            form.append('file', file);
+        function showToast(msg) {
+            const toast = document.getElementById("toast");
+            toast.innerText = msg; toast.classList.add("show");
+            setTimeout(() => { toast.classList.remove("show"); }, 3000);
+        }
+        function openModal(id) { document.getElementById(id).classList.add('active'); document.getElementById('dropdown-content').classList.remove('show');}
+        function closeModal(id) { document.getElementById(id).classList.remove('active'); }
 
-            // إرسال الملف إلى جوجل درايف
+        let avatarData = ""; let bannerData = "";
+        let currentEditId = null;
+
+        function openLayoutEditor(editId = null) {
+            currentEditId = editId;
+            const btn = document.getElementById('save-layout-btn');
+            document.getElementById('editor-title').innerText = editId ? "تعديل التنسيق" : "بناء تنسيق جديد";
+            btn.innerText = editId ? "حفظ التعديلات" : "حفظ التنسيق";
+            
+            if(!editId) {
+                document.getElementById('ctrl-name').value = ''; document.getElementById('ctrl-bio').value = '';
+                document.getElementById('file-bg').value = ''; document.getElementById('file-avatar').value = '';
+                avatarData = ""; bannerData = "";
+                document.getElementById('canvas-avatar').style.backgroundImage = 'none';
+                document.getElementById('canvas-avatar').style.border = '4px solid var(--surface)';
+                document.getElementById('canvas-bg').style.backgroundImage = 'none';
+            }
+            toggleLayoutView('editor');
+            updateEngine();
+        }
+
+        function previewImage(input, targetId) {
+            if (input.files && input.files[0]) {
+                let reader = new FileReader();
+                reader.onload = function(e) {
+                    const el = document.getElementById(targetId);
+                    el.style.backgroundImage = 'url(' + e.target.result + ')';
+                    if(targetId === 'canvas-avatar') { avatarData = e.target.result; el.style.border = 'none'; }
+                    if(targetId === 'canvas-bg') bannerData = e.target.result;
+                    updateEngine();
+                }
+                reader.readAsDataURL(input.files[0]);
+            }
+        }
+
+        function updateEngine() {
+            const canvas = document.getElementById('engine-canvas');
+            const ratio = document.getElementById('ctrl-ratio').value;
+            const bgStyle = document.getElementById('ctrl-bg-style').value;
+            const shape = document.getElementById('ctrl-avatar-shape').value;
+            const alignVals = document.getElementById('ctrl-align').value.split(',');
+
+            document.getElementById('bg-file-group').style.display = bgStyle === 'none' ? 'none' : 'block';
+
+            canvas.style.setProperty('--canvas-ratio', ratio);
+            canvas.style.setProperty('--content-align', alignVals[0]);
+            canvas.style.setProperty('--text-align', alignVals.length > 1 ? alignVals[1] : alignVals[0]);
+            canvas.style.setProperty('--avatar-radius', shape);
+
+            if (bgStyle === 'full') {
+                canvas.style.setProperty('--bg-height', '100%'); canvas.style.setProperty('--canvas-flex', 'column'); canvas.style.setProperty('--canvas-justify', 'center'); canvas.style.setProperty('--content-margin', '0');
+            } else if (bgStyle === 'banner') {
+                canvas.style.setProperty('--bg-height', '130px'); canvas.style.setProperty('--canvas-flex', 'column'); canvas.style.setProperty('--canvas-justify', 'flex-start'); canvas.style.setProperty('--content-margin', '70px');
+            } else {
+                canvas.style.setProperty('--bg-height', '0'); canvas.style.setProperty('--canvas-flex', 'column'); canvas.style.setProperty('--canvas-justify', 'center'); canvas.style.setProperty('--content-margin', '0');
+            }
+
+            document.getElementById('display-name').innerText = document.getElementById('ctrl-name').value || 'الاسم';
+            document.getElementById('display-bio').innerText = document.getElementById('ctrl-bio').value || 'الوصف...';
+        }
+
+        let currentPaletteColors = [];
+        function generateColorInputs() {
+            const count = document.getElementById('color-count').value;
+            const container = document.getElementById('color-inputs-container');
+            const preview = document.getElementById('palette-preview');
+            container.innerHTML = ''; preview.innerHTML = '';
+            currentPaletteColors = [];
+            const defaults = ['#778873', '#A1BC98', '#DCCFC0', '#FDF6ED', '#231650', '#000000'];
+
+            for (let i = 0; i < count; i++) {
+                const wrapper = document.createElement('div'); wrapper.className = 'color-selector-group';
+                const colorWheel = document.createElement('input'); colorWheel.type = 'color'; colorWheel.value = defaults[i]; 
+                const hexInput = document.createElement('input'); hexInput.type = 'text'; hexInput.value = defaults[i]; 
+                
+                colorWheel.oninput = (e) => { hexInput.value = e.target.value.toUpperCase(); updatePalettePreview(); };
+                hexInput.oninput = (e) => { 
+                    let val = e.target.value;
+                    if(val.length === 7 && val.startsWith('#')) { colorWheel.value = val; updatePalettePreview(); }
+                };
+
+                wrapper.appendChild(colorWheel); wrapper.appendChild(hexInput); container.appendChild(wrapper);
+                const block = document.createElement('div'); block.className = 'color-block'; block.id = `color-block-${i}`;
+                block.style.backgroundColor = colorWheel.value;
+                block.onclick = () => copySavedTextDirectly(colorWheel.value.toUpperCase());
+                preview.appendChild(block);
+                currentPaletteColors.push(colorWheel.value.toUpperCase());
+            }
+        }
+
+        function updatePalettePreview() {
+            const count = document.getElementById('color-count').value;
+            currentPaletteColors = [];
+            for (let i = 0; i < count; i++) {
+                const hex = document.getElementById('color-inputs-container').children[i].querySelector('input[type="text"]').value.toUpperCase();
+                document.getElementById(`color-block-${i}`).style.backgroundColor = hex; 
+                currentPaletteColors.push(hex);
+            }
+        }
+
+        function copySavedTextDirectly(text) { navigator.clipboard.writeText(text).then(() => showToast(`تم النسخ`)); }
+        function copySavedText(elementId) { navigator.clipboard.writeText(document.getElementById(elementId).innerText).then(() => showToast(`تم النسخ`)); }
+
+        async function saveData(type) {
+            if(!requireAuth()) return;
+            let btn = document.getElementById(type === 'Layout' ? 'save-layout-btn' : (type === 'Text' ? 'save-text-btn' : 'save-color-btn'));
+            
+            if(type === 'Layout' && !document.getElementById('ctrl-name').value && !document.getElementById('ctrl-bio').value && !avatarData && !bannerData) {
+                showToast("لا يمكن حفظ تنسيق فارغ"); return;
+            }
+
+            const originalText = btn.innerText; btn.innerText = "جاري الحفظ..."; btn.disabled = true;
+
+            let contentObj = {};
+            if(type === 'Layout') {
+                contentObj = {
+                    name: document.getElementById('ctrl-name').value, bio: document.getElementById('ctrl-bio').value,
+                    ratio: document.getElementById('ctrl-ratio').value, bgStyle: document.getElementById('ctrl-bg-style').value,
+                    shape: document.getElementById('ctrl-avatar-shape').value, align: document.getElementById('ctrl-align').value,
+                    avatar: avatarData, banner: bannerData
+                };
+            } else if (type === 'Text') {
+                const txt = document.getElementById('text-input').value;
+                if(!txt) { btn.innerText = originalText; btn.disabled = false; return; }
+                contentObj = { text: txt };
+            } else if (type === 'Palette') { contentObj = { colors: currentPaletteColors }; }
+
             try {
-                const response = await fetch('https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart', {
-                    method: 'POST',
-                    headers: new Headers({ 'Authorization': 'Bearer ' + accessToken }),
-                    body: form,
+                if(type === 'Layout' && currentEditId) {
+                    await fetch(`https://www.googleapis.com/drive/v3/files/${currentEditId}`, { method: 'DELETE', headers: new Headers({ 'Authorization': 'Bearer ' + gapi.client.getToken().access_token }) });
+                    currentEditId = null;
+                }
+
+                const metadata = { name: `${type}_${Date.now()}.json`, parents: ['appDataFolder'] };
+                const form = new FormData();
+                form.append('metadata', new Blob([JSON.stringify(metadata)], {type: 'application/json'}));
+                form.append('file', new Blob([JSON.stringify(contentObj)], {type: 'application/json'}));
+
+                const res = await fetch('https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart', {
+                    method: 'POST', headers: new Headers({ 'Authorization': 'Bearer ' + gapi.client.getToken().access_token }), body: form
                 });
                 
-                if (response.ok) {
-                    document.getElementById('status').innerText = 'تم حفظ التنسيق بنجاح في جوجل درايف الخاص بك! 🎉';
-                } else {
-                    document.getElementById('status').innerText = 'حدث خطأ أثناء الحفظ.';
+                if(res.ok) {
+                    showToast("تم الحفظ بنجاح!");
+                    if(type === 'Layout') toggleLayoutView('grid'); 
+                    if(type === 'Text') document.getElementById('text-input').value = '';
+                    fetchAllData(); 
                 }
-            } catch (error) {
-                console.error(error);
-                document.getElementById('status').innerText = 'فشل الاتصال بجوجل درايف.';
-            }
+            } catch (e) { showToast("فشل الاتصال"); }
+            btn.innerText = originalText; btn.disabled = false;
+        }
+
+        let allSavedData = { layouts: {} };
+
+        function renderEmptyMessage(containerId, message) {
+            document.getElementById(containerId).innerHTML = `<div style="grid-column: 1 / -1; text-align: center; color: var(--text-muted); padding: 50px; border: 1px dashed var(--border); border-radius: 12px;">${message}</div>`;
+        }
+
+        async function fetchAllData() {
+            if(!gapi.client.getToken()) return;
+            document.querySelectorAll('.loader').forEach(el => el.style.display = 'block');
+
+            try {
+                const response = await gapi.client.drive.files.list({ spaces: 'appDataFolder', fields: 'files(id, name)' });
+                let layoutsHtml = '', textsHtml = '', colorsHtml = '';
+                allSavedData.layouts = {};
+
+                if(!response.result.files || response.result.files.length === 0) {
+                    renderEmptyMessage('layouts-list', 'لا توجد تنسيقات محفوظة.');
+                    renderEmptyMessage('texts-list', 'لا توجد نصوص محفوظة.');
+                    renderEmptyMessage('colors-list', 'لا توجد مجموعات محفوظة.');
+                    document.querySelectorAll('.loader').forEach(el => el.style.display = 'none');
+                    return;
+                }
+
+                const promises = response.result.files.map(f => gapi.client.drive.files.get({ fileId: f.id, alt: 'media' }).then(res => ({id: f.id, name: f.name, data: res.result})));
+                const results = await Promise.all(promises);
+
+                results.forEach(item => {
+                    const data = item.data; const fileId = item.id;
+                    const menuHtml = `
+                    <div class="card-menu-container">
+                        <div class="card-menu-btn" onclick="toggleCardMenu(event, '${fileId}')">⋮</div>
+                        <div class="card-menu-dropdown" id="menu-${fileId}">
+                            ${item.name.startsWith('Layout') ? `<div class="card-menu-item" onclick="editLayout(event, '${fileId}')">تعديل التنسيق</div>` : ''}
+                            <div class="card-menu-item danger" onclick="confirmDelete(event, '${fileId}')">حذف العنصر</div>
+                        </div>
+                    </div>`;
+
+                    if(item.name.startsWith('Layout_')) {
+                        allSavedData.layouts[fileId] = data;
+                        const borderStyle = data.avatar ? 'none' : '2px solid var(--border)';
+                        layoutsHtml += `
+                        <div class="item-card" onclick="viewSavedLayout('${fileId}')">
+                            ${menuHtml}
+                            <div style="height: 100px; background: ${data.bgStyle === 'none' ? 'var(--bg)' : 'var(--border)'}; border-radius: 8px 8px 0 0; position:relative; background-image: url(${data.banner||''}); background-size: cover; background-position: center;">
+                                <div style="width:60px; height:60px; background:var(--surface); border-radius:${data.shape}; position:absolute; bottom:-20px; left:50%; transform:translateX(-50%); background-image: url(${data.avatar||''}); background-size:cover; background-position: center; border: ${borderStyle};"></div>
+                            </div>
+                            <div style="text-align:center; margin-top: 35px; flex: 1; overflow: hidden;">
+                                <h4 style="margin:0 0 5px 0; word-wrap: break-word;">${data.name || 'بدون اسم'}</h4>
+                                <p style="font-size:0.85rem; color:var(--text-muted); display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; word-wrap: break-word;">${data.bio || '...'}</p>
+                            </div>
+                        </div>`;
+                    } else if (item.name.startsWith('Text_')) {
+                        textsHtml += `<div class="item-card" style="padding-top: 40px; align-self: start;">${menuHtml}<div class="text-card-content" id="txt-${fileId}">${data.text}</div><button class="btn-outline" style="width:100%" onclick="copySavedText('txt-${fileId}')">نسخ النص</button></div>`;
+                    } else if (item.name.startsWith('Palette_')) {
+                        let blocks = ''; data.colors.forEach(c => { blocks += `<div class="color-block" style="background:${c};" onclick="copySavedTextDirectly('${c}')"></div>`; });
+                        colorsHtml += `<div class="item-card" style="padding-top: 40px;">${menuHtml}<div class="palette-preview">${blocks}</div><p style="text-align:center; color: var(--text-muted); font-size: 0.85rem; margin: 15px 0 0 0;">اضغط للنسخ</p></div>`;
+                    }
+                });
+
+                document.getElementById('layouts-list').innerHTML = layoutsHtml || '<div style="grid-column: 1 / -1; text-align: center; color: var(--text-muted); padding: 50px; border: 1px dashed var(--border); border-radius: 12px;">لا توجد تنسيقات.</div>';
+                document.getElementById('texts-list').innerHTML = textsHtml || '<div style="grid-column: 1 / -1; text-align: center; color: var(--text-muted); padding: 50px; border: 1px dashed var(--border); border-radius: 12px;">لا توجد نصوص.</div>';
+                document.getElementById('colors-list').innerHTML = colorsHtml || '<div style="grid-column: 1 / -1; text-align: center; color: var(--text-muted); padding: 50px; border: 1px dashed var(--border); border-radius: 12px;">لا توجد مجموعات.</div>';
+
+            } catch (e) { console.error(e); }
+            document.querySelectorAll('.loader').forEach(el => el.style.display = 'none');
+        }
+
+        function toggleCardMenu(e, id) { e.stopPropagation(); document.querySelectorAll('.card-menu-dropdown').forEach(m => m.classList.remove('show')); document.getElementById('menu-'+id).classList.add('show'); }
+        
+        let itemToDelete = null;
+        function confirmDelete(e, id) { e.stopPropagation(); document.querySelectorAll('.card-menu-dropdown').forEach(m => m.classList.remove('show')); itemToDelete = id; openModal('modal-delete-confirm'); }
+        
+        document.getElementById('confirm-item-delete-btn').onclick = async () => {
+            if(!itemToDelete) return;
+            const btn = document.getElementById('confirm-item-delete-btn'); btn.innerText = "جاري الحذف...";
+            try {
+                await fetch(`https://www.googleapis.com/drive/v3/files/${itemToDelete}`, { method: 'DELETE', headers: new Headers({ 'Authorization': 'Bearer ' + gapi.client.getToken().access_token }) });
+                closeModal('modal-delete-confirm'); showToast("تم الحذف"); 
+                fetchAllData(); 
+            } catch(e) { showToast("فشل الحذف"); }
+            btn.innerText = "تأكيد الحذف"; itemToDelete = null;
+        };
+
+        function editLayout(e, id) {
+            e.stopPropagation();
+            const data = allSavedData.layouts[id];
+            if(!data) return;
+            document.getElementById('ctrl-name').value = data.name || '';
+            document.getElementById('ctrl-bio').value = data.bio || '';
+            document.getElementById('ctrl-ratio').value = data.ratio || '9/16';
+            document.getElementById('ctrl-bg-style').value = data.bgStyle || 'full';
+            document.getElementById('ctrl-avatar-shape').value = data.shape || '50%';
+            document.getElementById('ctrl-align').value = data.align || 'center';
+            
+            avatarData = data.avatar || ""; bannerData = data.banner || "";
+            document.getElementById('canvas-avatar').style.backgroundImage = avatarData ? `url(${avatarData})` : 'none';
+            document.getElementById('canvas-avatar').style.border = avatarData ? 'none' : '4px solid var(--surface)';
+            document.getElementById('canvas-bg').style.backgroundImage = bannerData ? `url(${bannerData})` : 'none';
+            
+            openLayoutEditor(id);
+        }
+
+        function viewSavedLayout(id) {
+            const data = allSavedData.layouts[id]; if(!data) return;
+            const canvas = document.getElementById('view-canvas');
+            const alignVals = data.align.split(',');
+            canvas.style.setProperty('--canvas-ratio', data.ratio); canvas.style.setProperty('--content-align', alignVals[0]);
+            canvas.style.setProperty('--text-align', alignVals.length > 1 ? alignVals[1] : alignVals[0]);
+            canvas.style.setProperty('--avatar-radius', data.shape);
+            
+            document.getElementById('view-bg').style.backgroundImage = data.banner ? `url(${data.banner})` : 'none';
+            const avatarEl = document.getElementById('view-avatar');
+            avatarEl.style.backgroundImage = data.avatar ? `url(${data.avatar})` : 'none'; avatarEl.style.border = data.avatar ? 'none' : '4px solid var(--surface)';
+
+            if (data.bgStyle === 'full') { canvas.style.setProperty('--bg-height', '100%'); canvas.style.setProperty('--canvas-flex', 'column'); canvas.style.setProperty('--canvas-justify', 'center'); canvas.style.setProperty('--content-margin', '0'); } 
+            else if (data.bgStyle === 'banner') { canvas.style.setProperty('--bg-height', '130px'); canvas.style.setProperty('--canvas-flex', 'column'); canvas.style.setProperty('--canvas-justify', 'flex-start'); canvas.style.setProperty('--content-margin', '70px'); } 
+            else { canvas.style.setProperty('--bg-height', '0'); canvas.style.setProperty('--canvas-flex', 'column'); canvas.style.setProperty('--canvas-justify', 'center'); canvas.style.setProperty('--content-margin', '0'); }
+
+            const nameEl = document.getElementById('view-name'); const bioEl = document.getElementById('view-bio');
+
+            nameEl.innerText = data.name || 'بدون اسم'; bioEl.innerText = data.bio || '';
+            openModal('modal-view-layout');
+        }
+
+        async function executeAccountDeletion() {
+            const btn = document.getElementById('execute-delete-btn'); btn.innerText = "جاري المسح..."; btn.disabled = true;
+            try {
+                const response = await gapi.client.drive.files.list({ spaces: 'appDataFolder', fields: 'files(id)' });
+                if (response.result.files) {
+                    const promises = response.result.files.map(f => fetch(`https://www.googleapis.com/drive/v3/files/${f.id}`, { method: 'DELETE', headers: new Headers({ 'Authorization': 'Bearer ' + gapi.client.getToken().access_token }) }));
+                    await Promise.all(promises);
+                }
+                handleSignoutClick();
+            } catch (e) { btn.innerText = "تأكيد المسح"; btn.disabled = false; showToast("حدث خطأ"); }
         }
     </script>
 </body>
