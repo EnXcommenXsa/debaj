@@ -452,6 +452,22 @@
             }
 
             tokenClient = google.accounts.oauth2.initTokenClient({
+                tokenClient = google.accounts.oauth2.initTokenClient({
+            client_id: CLIENT_ID, scope: SCOPES,
+            callback: (response) => {
+                if (response && response.access_token) {
+                    isUserLoggedIn = true; // (1) تحديث حالة الدخول في نفس اللحظة
+                    localStorage.setItem('debaj_auth', 'true');
+                    sessionStorage.setItem('gapi_token', response.access_token);
+                    gapi.client.setToken({access_token: response.access_token}); // (2) ربط مفتاح الحفظ فوراً
+                    
+                    document.getElementById('login-btn').style.display = 'none';
+                    document.getElementById('user-menu').style.display = 'flex';
+                    updateUserNameDisplay();
+                    fetchAllData();
+                }
+            },
+        });
                 client_id: CLIENT_ID, scope: SCOPES,
                 callback: (response) => {
                     if (response && response.access_token) {
