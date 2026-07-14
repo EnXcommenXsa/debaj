@@ -82,7 +82,7 @@
         
         .mockup-header { height: 160px; background: var(--bg); position: relative; background-size: cover; background-position: center; }
         .mockup-avatar { width: 100px; height: 100px; background: #e2e8f0; border-radius: 50%; position: absolute; bottom: -50px; left: 50%; transform: translateX(-50%); border: 4px solid var(--surface); background-size: cover; background-position: center; }
-        .mockup-body { padding: 60px 20px 20px; text-align: center; flex: 1; background: var(--surface); }
+        .mockup-body { padding: 60px 20px 20px; text-align: center; flex: 1; background: var(--surface); overflow: hidden; }
 
         .dashboard-grid { display: grid; grid-template-columns: 1.2fr 1fr; gap: 40px; }
         @media (max-width: 900px) { .dashboard-grid { grid-template-columns: 1fr; } }
@@ -376,11 +376,11 @@
 
     <script>
         const carouselData = [
-            { id: "c1", name: "𝔐𝔞𝔯𝔧𝔞𝔫𝔞", bg: "2.jfif", avatar: "1.jfif" },
-            { id: "c2", name: "𝐙𝐞𝐫𝐨", bg: "22.jfif", avatar: "11.jfif" },
-            { id: "c3", name: "✧･ﾟ: Mary_88 :･ﾟ✧", bg: "222.jfif", avatar: "111.jfif" },
-            { id: "c4", name: "𝟢𝟘𝟬-𝓚𝗂𝚛𝓪", bg: "2222.jfif", avatar: "1111.jfif" },
-            { id: "c5", name: "🅝🅞🅜🅘", bg: "55.jfif", avatar: "5.jfif" },
+            { id: "c1", name: "𝔐𝔞𝔯𝔧𝔞𝔫𝔞", bg: "2.jfif", avatar: "1.jfif", bio: "“A room without books is like a body without a soul.”\n― Marcus Tullius Cicero" },
+            { id: "c2", name: "𝐙𝐞𝐫𝐨", bg: "22.jfif", avatar: "11.jfif", bio: "سأبقى أحبك راحلاً إليك.. إن كان في الماء فلا أخشى الغريق وإن كان في اليابسة فلا أهاب سيوف الطريق." },
+            { id: "c3", name: "✧･ﾟ: Mary_88 :･ﾟ✧", bg: "222.jfif", avatar: "111.jfif", bio: "INTJ - 5w4\n𝒟ℴ𝓃'𝓉 𝒸𝒶𝓇ℯ 𝒶𝓃𝓎𝓂ℴ𝓇ℯ" },
+            { id: "c4", name: "𝟢𝟘𝟬-𝓚𝗂𝚛𝓪", bg: "2222.jfif", avatar: "1111.jfif", bio: "imabananacat" },
+            { id: "c5", name: "🅝🅞🅜🅘", bg: "55.jfif", avatar: "5.jfif", bio: "أتظاهر بالسذاجة أحيانا, أمام حماقات البَعْض ، لأني لا أحِبَ أنْ أوْجِعَ رَأْسِي بِ تَفَاهَات لا تروق لي.!" }
         ];
 
         let carouselPositions = ['center', 'right', 'back', 'back', 'left'];
@@ -396,10 +396,9 @@
                     <div class="mockup-header" style="background-image: url('${item.bg}'); background-color: var(--border);">
                         <div class="mockup-avatar" style="background-image: url('${item.avatar}'); border-width: 3px;"></div>
                     </div>
-                    <div class="mockup-body" style="padding-top: 50px;">
-                        <h3 style="margin: 0 0 15px 0; color: var(--text);">${item.name}</h3>
-                        <div class="mockup-line" style="width: 70%"></div>
-                        <div class="mockup-line" style="width: 40%"></div>
+                    <div class="mockup-body" style="padding-top: 50px; display: flex; flex-direction: column; align-items: center;">
+                        <h3 style="margin: 0 0 10px 0; color: var(--text);">${item.name}</h3>
+                        <p style="font-size: 0.9rem; color: var(--text-muted); line-height: 1.5; white-space: pre-wrap; margin: 0; padding: 0 10px;">${item.bio}</p>
                     </div>
                 `;
                 card.onclick = () => rotateCarousel('right');
