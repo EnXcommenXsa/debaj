@@ -376,11 +376,11 @@
 
     <script>
         const carouselData = [
-            { id: "c1", name: "𝔐𝔞𝔯𝔧𝔞𝔫𝔞", bg: "download (2).jfif", avatar: "🩰🌷🍞.jfif" },
-            { id: "c2", name: "𝐙𝐞𝐫𝐨", bg: "download (3).jfif", avatar: "Light Yagami.jfif" },
-            { id: "c3", name: "✧･ﾟ: Mary_88 :･ﾟ✧", bg: "download.jfif", avatar: "Kana Arima.jfif" },
-            { id: "c4", name: "𝟢𝟘𝟬-𝓚𝗂𝚛𝓪", bg: "download (1).jfif", avatar: "Ryomen Sukuna VS Satoru Gojo.jfif" },
-            { id: "c5", name: "🅝🅞🅜🅘", bg: "", avatar: "" } // النموذج الإضافي
+            { id: "c1", name: "𝔐𝔞𝔯𝔧𝔞𝔫𝔞", bg: "11.jfif", avatar: "1.jfif" },
+            { id: "c2", name: "𝐙𝐞𝐫𝐨", bg: "22.jfif", avatar: "2.jfif" },
+            { id: "c3", name: "✧･ﾟ: Mary_88 :･ﾟ✧", bg: "1111.jfif", avatar: "111.jfif" },
+            { id: "c4", name: "𝟢𝟘𝟬-𝓚𝗂𝚛𝓪", bg: "2222.jfif", avatar: "222.jfif" },
+            { id: "c5", name: "🅝🅞🅜🅘", bg: "", avatar: "" } 
         ];
 
         let carouselPositions = ['center', 'right', 'back', 'back', 'left'];
@@ -444,7 +444,7 @@
                 document.getElementById('login-btn').style.display = 'none';
                 document.getElementById('user-menu').style.display = 'flex';
                 updateUserNameDisplay();
-                // استعادة الجلسة في الخلفية (Session caching)
+                
                 const cachedToken = sessionStorage.getItem('gapi_token');
                 if (cachedToken) {
                     gapi.client.setToken({access_token: cachedToken});
@@ -466,7 +466,7 @@
                 },
             });
 
-            // تجديد صامت إذا كان مسجلاً ولم يكن هناك توكن في الذاكرة المؤقتة
+            
             if(isUserLoggedIn && !sessionStorage.getItem('gapi_token')) {
                 tokenClient.requestAccessToken({prompt: 'none'});
             }
